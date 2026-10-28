@@ -1,0 +1,15 @@
+{
+  "name": "eelf-architecture-teardown",
+  "private": true,
+  "description": "Generator for the Eelf architecture teardown drawing",
+  "scripts": {
+    "build": "node tools/teardown/scripts/build-viewer.cjs drawing.json eelf-architecture.html",
+    "proof": "node tools/teardown/scripts/proof.cjs drawing.json proof/",
+    "check": "node tools/teardown/scripts/check-viewer.cjs eelf-architecture.html check/"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "jspdf": "^4.2.1",
+    "svg2pdf.js": "^2.8.1"
+  }
+}

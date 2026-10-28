@@ -1,0 +1,12 @@
+{
+  "name": "@eelf/browser",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": { "./*": "./src/*" },
+  "dependencies": {
+    "@eelf/simulation": "*",
+    "@fontsource/space-grotesk": "^5.2.0",
+    "lucide": "^0.468.0"
+  }
+}

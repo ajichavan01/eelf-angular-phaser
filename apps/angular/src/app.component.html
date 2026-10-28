@@ -1,0 +1,89 @@
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark"><eelf-icon name="Dna" /></div><div class="brand-name"><h1>Eelf</h1><span class="brand-caption">Ever Evolving Life Forms</span></div></div>
+    <span class="framework-label">Angular / Evolution lab</span>
+  </header>
+  <section class="metrics" aria-label="World statistics">
+    <div class="metric"><span class="metric-label">Population</span><div class="metric-line"><strong class="metric-value" data-testid="population-count">{{ state().frame?.statistics?.population ?? 0 }}</strong><span class="metric-note">+{{ count(state().frame?.statistics?.births ?? 0, 'birth', 'births') }} / {{ count(state().frame?.statistics?.deaths ?? 0, 'death', 'deaths') }}</span></div></div>
+    <div class="metric"><span class="metric-label">Generation</span><div class="metric-line"><strong class="metric-value">{{ state().frame?.statistics?.generation ?? 1 }}</strong><span class="metric-note">highest lineage</span></div></div>
+    <div class="metric"><span class="metric-label">Nourishment</span><div class="metric-line"><strong class="metric-value">{{ state().frame?.statistics?.plants ?? 0 }}</strong><span class="metric-note">plants / {{ state().frame?.statistics?.meat ?? 0 }} meat</span></div></div>
+    <div class="metric"><span class="metric-label">Elapsed</span><div class="metric-line"><strong class="metric-value" data-testid="elapsed">{{ formatTime(state().frame?.statistics?.time ?? 0) }}</strong><span class="metric-note">simulation time</span></div></div>
+  </section>
+  <div class="toolbar">
+    <div class="toolbar-group">
+      <button class="primary-button run-button" (click)="client.togglePause()" [disabled]="state().loading || !state().frame || state().frame?.statistics?.population === 0" [attr.data-paused]="state().paused ? '' : null" [attr.aria-label]="state().paused ? 'Run simulation' : 'Pause simulation'" [title]="state().paused ? 'Run simulation' : 'Pause simulation'"><span class="run-icon"><eelf-icon name="Play" class="icon-play" /><eelf-icon name="Pause" class="icon-pause" /></span>{{ state().paused ? 'Run' : 'Pause' }}</button>
+      <button class="icon-button" (click)="client.step()" [disabled]="!state().paused" aria-label="Advance one tick" title="Advance one tick"><eelf-icon name="StepForward" /></button>
+      <button class="icon-button" (click)="requestReset()" aria-label="Restart experiment" title="Restart experiment"><eelf-icon name="RotateCcw" /></button>
+      <span class="toolbar-divider"></span>
+      <div class="speed-control">@for (speed of speeds; track speed) { <button [class.active]="state().speed === speed" [attr.aria-pressed]="state().speed === speed" (click)="client.setSpeed(speed)" [attr.aria-label]="speed + 'x speed'">{{ speed }}x</button> }</div>
+    </div>
+    <div class="toolbar-group" style="gap: 12px">
+      <label class="overlay-toggle"><input type="checkbox" [(ngModel)]="senses" (ngModelChange)="updateOverlays()">Senses</label>
+      <label class="overlay-toggle"><input type="checkbox" [(ngModel)]="energy" (ngModelChange)="updateOverlays()">Energy</label>
+      <label class="overlay-toggle"><input type="checkbox" [(ngModel)]="grid" (ngModelChange)="updateOverlays()">Grid</label>
+    </div>
+    <div class="toolbar-group">
+      <button class="icon-button" (click)="client.feed()" [disabled]="!state().frame" aria-label="Add nourishment" title="Add nourishment"><eelf-icon name="Leaf" /></button>
+      <span class="toolbar-divider"></span>
+      <button class="icon-button" (click)="save()" [disabled]="!state().frame" aria-label="Export experiment" title="Export experiment"><eelf-icon name="Download" /></button>
+      <button #importButton class="icon-button" (click)="requestImport()" aria-label="Import experiment" title="Import experiment"><eelf-icon name="Upload" /></button>
+      <input #fileInput type="file" accept=".json,application/json" (change)="load($event)" hidden aria-label="Experiment file">
+    </div>
+  </div>
+  @if (state().error) { <div class="error-banner" role="alert"><span>{{ state().error }}</span><button class="icon-button" (click)="client.clearError(); importButton.focus()" title="Dismiss error" aria-label="Dismiss error"><eelf-icon name="X" /></button></div> }
+  <main class="lab-layout">
+    <section class="world-column" aria-label="Ecosystem">
+      <div class="world-stage">
+        <canvas #worldCanvas class="world-canvas" data-testid="world-canvas" aria-label="Live ecosystem. Creature selection is also available in the Population panel."></canvas>
+        <div class="world-label"><span class="status-dot" [class.paused]="state().paused"></span><span data-testid="run-state">{{ state().loading ? 'Initializing' : state().paused ? 'Paused' : 'Live ecosystem' }}</span></div>
+        <div class="camera-tools"><button class="icon-button" (click)="renderer?.adjustZoom(1.25)" title="Zoom in" aria-label="Zoom in"><eelf-icon name="ZoomIn" /></button><button class="icon-button" (click)="renderer?.adjustZoom(0.8)" title="Zoom out" aria-label="Zoom out"><eelf-icon name="ZoomOut" /></button><button class="icon-button" (click)="renderer?.fit()" title="Fit world" aria-label="Fit world"><eelf-icon name="Focus" /></button><button class="icon-button" (click)="renderer?.pan(0, 80)" title="Pan up" aria-label="Pan up"><eelf-icon name="ArrowUp" /></button><button class="icon-button" (click)="renderer?.pan(0, -80)" title="Pan down" aria-label="Pan down"><eelf-icon name="ArrowDown" /></button><button class="icon-button" (click)="renderer?.pan(80, 0)" title="Pan left" aria-label="Pan left"><eelf-icon name="ArrowLeft" /></button><button class="icon-button" (click)="renderer?.pan(-80, 0)" title="Pan right" aria-label="Pan right"><eelf-icon name="ArrowRight" /></button></div>
+        <span class="world-caption">Seed {{ state().config.seed }} / {{ state().config.width }} × {{ state().config.height }}</span>
+        @if (state().loading) { <div class="world-state"><span>Initializing experiment</span></div> }
+        @if (state().frame && state().frame?.statistics?.population === 0) { <div class="world-state"><h2>Population extinct</h2><button class="primary-button" (click)="reset()"><eelf-icon name="RotateCcw" />Restart experiment</button></div> }
+      </div>
+      <div class="world-footer"><div class="legend"><span class="legend-item"><i class="swatch"></i>Plants</span><span class="legend-item"><i class="swatch meat"></i>Meat</span></div><span class="mono" data-testid="tick">Tick {{ state().frame?.statistics?.tick ?? 0 }}</span><span class="mono">{{ state().computeMs.toFixed(1) }} ms / worker</span></div>
+      <section class="history-section" aria-label="Population history"><div class="section-heading"><h2>Population dynamics</h2><div class="legend"><span class="legend-item"><i class="swatch population"></i><small>Population</small></span><span class="legend-item"><i class="swatch energy"></i><small>Energy</small></span></div></div><canvas #history class="history-chart" aria-label="Rolling population and average energy chart"></canvas></section>
+    </section>
+    <aside class="side-panel" aria-label="Experiment panels">
+      <nav class="panel-tabs" role="tablist" aria-label="Lab panels" (keydown)="tabKey($event)">
+        <button id="inspector-tab" role="tab" aria-controls="inspector-panel" [attr.aria-selected]="panel() === 'inspector'" [tabIndex]="panel() === 'inspector' ? 0 : -1" (click)="panel.set('inspector')">Inspector</button>
+        <button id="environment-tab" role="tab" aria-controls="environment-panel" [attr.aria-selected]="panel() === 'environment'" [tabIndex]="panel() === 'environment' ? 0 : -1" (click)="panel.set('environment')">Environment</button>
+        <button id="population-tab" role="tab" aria-controls="population-panel" [attr.aria-selected]="panel() === 'population'" [tabIndex]="panel() === 'population' ? 0 : -1" (click)="panel.set('population')">Population</button>
+      </nav>
+      <div class="panel-body">
+        <section class="panel-section" id="inspector-panel" role="tabpanel" aria-labelledby="inspector-tab" [hidden]="panel() !== 'inspector'">
+          <div class="specimen-heading"><div><span class="eyebrow">Selected creature</span><h2 data-testid="selected-creature">{{ state().selected ? 'Creature #' + state().selected?.id : 'No selection' }}</h2></div><span class="action-tag" [hidden]="!state().selected">{{ state().selected?.action }}</span></div>
+          <div class="preview-wrap"><canvas #preview class="creature-preview" width="600" height="268" aria-label="Selected creature anatomy"></canvas></div>
+          @if (state().selected; as creature) {
+            <div class="vital"><div class="vital-heading"><span>Energy</span><span class="mono">{{ percent(creature.energy / creature.traits.maxEnergy) }}%</span></div><div class="meter"><span class="meter-fill" [style.width.%]="percent(creature.energy / creature.traits.maxEnergy)"></span></div></div>
+            <div class="vital"><div class="vital-heading"><span>Health</span><span class="mono">{{ percent(creature.health / creature.traits.maxHealth) }}%</span></div><div class="meter"><span class="meter-fill health" [style.width.%]="percent(creature.health / creature.traits.maxHealth)"></span></div></div>
+            <dl class="detail-grid"><div><dt>Generation</dt><dd>{{ creature.generation }}</dd></div><div><dt>Age / lifespan</dt><dd>{{ formatTime(creature.age) }} / {{ formatTime(creature.traits.lifespan) }}</dd></div><div><dt>Base speed</dt><dd>{{ creature.traits.speed.toFixed(1) }} u/s</dd></div><div><dt>Body mass</dt><dd>{{ creature.traits.mass.toFixed(1) }}</dd></div><div><dt>Vision / scent</dt><dd>{{ creature.traits.visionRange.toFixed(0) }} / {{ creature.traits.scentRange.toFixed(0) }}</dd></div><div><dt>Parents</dt><dd>{{ creature.parents.length ? creature.parents.join(', ') : 'Founder' }}</dd></div></dl>
+            <div class="feature-list"><span class="feature" [class.enabled]="creature.traits.eyes">Eyes<span class="visually-hidden">{{ creature.traits.eyes ? ', present' : ', absent' }}</span></span><span class="feature" [class.enabled]="creature.traits.mouth">Mouth<span class="visually-hidden">{{ creature.traits.mouth ? ', present' : ', absent' }}</span></span><span class="feature" [class.enabled]="creature.traits.flippers">Flippers<span class="visually-hidden">{{ creature.traits.flippers ? ', present' : ', absent' }}</span></span><span class="feature" [class.enabled]="creature.traits.tail">Tail<span class="visually-hidden">{{ creature.traits.tail ? ', present' : ', absent' }}</span></span></div>
+            <div class="section-heading"><h3>Genome</h3><small>8 chromosomes / 36 genes</small></div>
+            @for (chromosome of chromosomes; track chromosome) { <details class="chromosome" [open]="chromosome === 'Body'"><summary>{{ chromosome }}<span>{{ genes(chromosome).length }}</span></summary>@for (identifier of genes(chromosome); track identifier; let index = $index) { <div class="gene-row"><span>{{ geneLabel(identifier) }}</span><span class="gene-track"><i [style.width.%]="creature.genome[chromosome][index] * 100"></i></span><span class="gene-value">{{ creature.genome[chromosome][index].toFixed(2) }}</span></div> }</details> }
+          } @else { <div class="empty-state">No creature selected. Select a creature in the world, or choose one from the Population tab.</div> }
+        </section>
+        <section class="panel-section" id="environment-panel" role="tabpanel" aria-labelledby="environment-tab" [hidden]="panel() !== 'environment'">
+          <form #settingsForm ngNativeValidate (ngSubmit)="requestReset()">
+            <fieldset class="form-section"><legend>Experiment</legend><label class="form-row">Seed<input name="seed" type="number" min="0" max="4294967295" step="1" required [(ngModel)]="draft.seed"></label><div class="form-grid"><label class="form-row">Initial population<input name="initialPopulation" type="number" min="0" [max]="draft.maxPopulation" step="1" required [(ngModel)]="draft.initialPopulation"></label><label class="form-row">Population limit<input name="maxPopulation" type="number" min="1" max="1500" step="1" required [(ngModel)]="draft.maxPopulation"></label></div></fieldset>
+            <fieldset class="form-section"><legend>World</legend><div class="form-grid"><label class="form-row">Width<input name="width" type="number" min="400" max="4000" step="1" required [(ngModel)]="draft.width"></label><label class="form-row">Height<input name="height" type="number" min="300" max="3000" step="1" required [(ngModel)]="draft.height"></label></div><label class="form-row">Plant capacity<input name="plants" type="number" min="0" max="2000" step="1" required [(ngModel)]="draft.plants"></label><label class="form-row"><span class="range-caption"><span>Plant growth</span><span class="mono">{{ draft.foodGrowth }} / s</span></span><input name="foodGrowth" type="range" min="0" max="8" step="0.1" [(ngModel)]="draft.foodGrowth"></label></fieldset>
+            <fieldset class="form-section"><legend>Genetics</legend><label class="form-row"><span class="range-caption"><span>Base mutation probability</span><span class="mono">{{ percent(draft.mutationRate) }}%</span></span><input name="mutationRate" type="range" min="0" max="0.5" step="0.01" [(ngModel)]="draft.mutationRate"></label></fieldset>
+            <button type="submit" class="full-width"><eelf-icon name="RotateCcw" />Start new experiment</button>
+          </form>
+        </section>
+        <section class="panel-section" id="population-panel" role="tabpanel" aria-labelledby="population-tab" [hidden]="panel() !== 'population'">
+          <div class="section-heading"><h2 id="population-heading" tabindex="-1">Living population</h2><small>{{ count(filteredPopulation().length, 'creature', 'creatures') }}</small></div>
+          <div class="population-controls"><label class="form-row">Filter creature ID<input #searchInput class="search-input" type="search" inputmode="numeric" placeholder="Creature ID" [(ngModel)]="search" (ngModelChange)="page = 0"></label><label class="form-row">Sort population<select class="sort-select" [(ngModel)]="sort" (ngModelChange)="page = 0"><option value="id">ID</option><option value="energy">Energy</option><option value="generation">Generation</option></select></label></div>
+          @for (creature of populationRows(); track creature.id) { <button class="population-row" [attr.data-creature]="creature.id" (click)="select(creature.id)"><span class="population-swatch" [style.background]="color(creature.traits.hue)"></span><span><strong>Creature #{{ creature.id }}</strong><small>Generation {{ creature.generation }}</small></span><span class="mono">{{ percent(creature.energy) }}%</span></button> } @empty { @if (search.trim()) { <div class="empty-state">No creatures match "{{ search.trim() }}".<button type="button" (click)="search = ''; page = 0; searchInput.focus()">Clear filter</button></div> } @else { <div class="empty-state">No living creatures</div> } }
+          <div class="pagination"><button class="icon-button" [disabled]="currentPage() === 0" (click)="page = currentPage() - 1" aria-label="Previous population page" title="Previous page"><eelf-icon name="ChevronLeft" /></button><span>Page {{ currentPage() + 1 }}</span><button class="icon-button" [disabled]="(currentPage() + 1) * 40 >= filteredPopulation().length" (click)="page = currentPage() + 1" aria-label="Next population page" title="Next page"><eelf-icon name="ChevronRight" /></button></div>
+        </section>
+      </div>
+    </aside>
+  </main>
+  <span class="visually-hidden" aria-live="polite">{{ state().notice }}</span>
+  <dialog #confirmDialog class="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-body">
+    <h2 id="confirm-title">{{ confirmKind() === 'import' ? 'Replace current experiment?' : 'Restart experiment?' }}</h2>
+    <p id="confirm-body">@if (confirmKind() === 'import') {Importing a file replaces the running experiment. Export it first to keep it.} @else {This discards the current experiment at Tick {{ confirmStats().tick }} with {{ count(confirmStats().population, 'creature', 'creatures') }}. Export it first to keep it.}</p>
+    <div class="dialog-actions"><button type="button" autofocus (click)="confirmDialog.close()">Cancel</button><button type="button" class="primary-button" (click)="confirmAction()">{{ confirmKind() === 'import' ? 'Choose file' : 'Restart experiment' }}</button></div>
+  </dialog>
+</div>

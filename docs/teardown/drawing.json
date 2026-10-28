@@ -1,0 +1,29 @@
+{
+  "dependencies": "node_modules",
+  "modelScripts": ["model.js"],
+  "drawings": [{
+    "id": "architecture",
+    "title": "Eelf web architecture",
+    "description": "Concept drawing. Each plate is one layer of the Eelf web apps: the shared simulation and worker at the bottom, the postMessage streams between worker and client, then one column each for the Angular and Phaser apps. Plate sizes and positions are illustrative, not measured.",
+    "parts": [
+      {"id": "core", "name": "Simulation core"},
+      {"id": "clock", "name": "Fixed-step clock"},
+      {"id": "worker", "name": "Worker runtime"},
+      {"id": "snapshots", "name": "Snapshot stream"},
+      {"id": "commands", "name": "Command stream"},
+      {"id": "client", "name": "Simulation client"},
+      {"id": "angularRenderer", "name": "Canvas 2D renderer"},
+      {"id": "phaserScene", "name": "Phaser WebGL scene"},
+      {"id": "angularControls", "name": "Angular controls"},
+      {"id": "phaserPanels", "name": "Phaser DOM panels"}
+    ],
+    "parameters": [],
+    "colors": {
+      "hues": {
+        "core": 163, "clock": 163, "worker": 163, "snapshots": 200, "commands": 35, "client": 163,
+        "angularRenderer": 350, "angularControls": 350, "phaserScene": 265, "phaserPanels": 265
+      },
+      "fills": ["core", "clock", "worker", "snapshots", "commands", "client", "angularRenderer", "phaserScene", "angularControls", "phaserPanels"]
+    }
+  }]
+}

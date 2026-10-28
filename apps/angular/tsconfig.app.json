@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/app",
+    "experimentalDecorators": true,
+    "types": [],
+    "useDefineForClassFields": false
+  },
+  "angularCompilerOptions": { "strictInjectionParameters": true, "strictInputAccessModifiers": true, "strictTemplates": true },
+  "files": ["src/main.ts"],
+  "include": ["src/**/*.d.ts"]
+}

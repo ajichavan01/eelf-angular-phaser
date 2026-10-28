@@ -1,0 +1,19 @@
+node_modules/
+dist/
+coverage/
+.cache/
+.npm/
+**/.angular/cache/
+playwright-report/
+test-results/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# OS and editor files
+.DS_Store
+.vscode/
+.idea/
+*.swp
