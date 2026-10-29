@@ -1,4 +1,5 @@
-import { clamp, Random } from '../Utilities.ts';
+import type { Random } from '../Utilities.ts';
+import { clamp } from '../Utilities.ts';
 
 export const CHROMOSOMES = ['Body', 'Vision', 'Physics', 'Mouth', 'Aging', 'Metabolism', 'Reproduction', 'Olfactory'] as const;
 export type ChromosomeID = typeof CHROMOSOMES[number];

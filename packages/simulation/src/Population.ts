@@ -2,7 +2,7 @@ import type { Creature } from './Creature/Creature.ts';
 import { createCreature } from './Creature/Creature.ts';
 import type { GameParameters } from './GameParameters.ts';
 import { createGenome } from './Genetics/Genome.ts';
-import { Random } from './Utilities.ts';
+import type { Random } from './Utilities.ts';
 
 export class Population {
   creatures: Creature[] = [];

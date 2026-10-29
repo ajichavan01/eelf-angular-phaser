@@ -1,8 +1,9 @@
 import type { Creature } from './Creature.ts';
 import type { Nourishment } from '../Nourishments/Nourishment.ts';
 import type { GameParameters } from '../GameParameters.ts';
-import { SpatialHash } from '../SpatialHash.ts';
-import { distanceSquared, Random } from '../Utilities.ts';
+import type { SpatialHash } from '../SpatialHash.ts';
+import type { Random } from '../Utilities.ts';
+import { distanceSquared } from '../Utilities.ts';
 import { canSee, canSmell } from './CreatureVision.ts';
 
 export function decide(creature: Creature, foods: SpatialHash<Nourishment>, config: GameParameters, random: Random): void {

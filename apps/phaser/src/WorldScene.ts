@@ -234,7 +234,7 @@ export class PhaserRenderer {
     this.game = new Phaser.Game({
       type: Phaser.AUTO, parent: host, width: host.clientWidth || 640, height: host.clientHeight || 480,
       backgroundColor: WORLD_COLORS.world, banner: false, scene: [this.scene],
-      resolution: Math.min(devicePixelRatio || 1, 2), audio: { noAudio: true },
+      audio: { noAudio: true },
       scale: { mode: Phaser.Scale.RESIZE, autoCenter: Phaser.Scale.NO_CENTER },
       render: { antialias: true, roundPixels: false },
       callbacks: { postBoot: game => { game.canvas.dataset.testid = 'world-canvas'; game.canvas.setAttribute('aria-label', 'Live ecosystem. Creature selection is also available in the Population panel.'); } },

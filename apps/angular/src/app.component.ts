@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Injector, ViewChild, afterNextRender, inject, signal } from '@angular/core';
-import type { AfterViewInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Injector, ViewChild, afterNextRender, inject, signal } from '@angular/core';
+import type { AfterViewInit, OnDestroy , ElementRef} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CHROMOSOMES, GENE_DEFINITIONS } from '@eelf/simulation';
 import type { ChromosomeID, GameParameters, RenderCreature } from '@eelf/simulation';

@@ -13,19 +13,33 @@
   "scripts": {
     "dev:angular": "npm run dev --workspace @eelf/angular",
     "dev:phaser": "npm run dev --workspace @eelf/phaser",
-    "dev": "npm run dev --workspaces --if-present --parallel",
+    "dev": "npm run dev --workspace @eelf/angular && npm run dev --workspace @eelf/phaser",
     "build": "npm run build --workspace @eelf/angular && npm run build --workspace @eelf/phaser",
     "test": "node --experimental-strip-types --test packages/simulation/test/*.test.ts",
     "benchmark": "node --experimental-strip-types packages/simulation/benchmark.ts",
     "test:ui": "playwright test",
     "typecheck": "tsc --project packages/simulation/tsconfig.json --noEmit && tsc --project packages/browser/tsconfig.json --noEmit",
-    "check": "npm test && npm run typecheck && npm run build"
+    "check": "npm run lint && npm test && npm run typecheck && npm run build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.56.0",
     "@types/node": "^22.18.0",
     "@types/pngjs": "^6.0.5",
+    "angular-eslint": "^21.4.0",
+    "eslint": "^10.13.0",
+    "globals": "^17.13.0",
     "pngjs": "^7.0.0",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.72.1"
+  },
+  "allowScripts": {
+    "@parcel/watcher@2.6.0": true,
+    "lmdb@3.5.1": true,
+    "msgpackr-extract@3.0.4": true,
+    "esbuild@0.28.1": true,
+    "fsevents@2.3.3": true
   }
 }

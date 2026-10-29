@@ -2,7 +2,8 @@ import type { Creature } from './Creature.ts';
 import { createCreature } from './Creature.ts';
 import type { GameParameters } from '../GameParameters.ts';
 import { inheritGenome } from '../Genetics/Genome.ts';
-import { clamp, Random } from '../Utilities.ts';
+import type { Random } from '../Utilities.ts';
+import { clamp } from '../Utilities.ts';
 
 export const readyToReproduce = (creature: Creature): boolean =>
   creature.age >= creature.traits.maturity && creature.cooldown === 0 &&

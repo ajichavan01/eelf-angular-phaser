@@ -45,6 +45,8 @@
       <section class="history-section" aria-label="Population history"><div class="section-heading"><h2>Population dynamics</h2><div class="legend"><span class="legend-item"><i class="swatch population"></i><small>Population</small></span><span class="legend-item"><i class="swatch energy"></i><small>Energy</small></span></div></div><canvas #history class="history-chart" aria-label="Rolling population and average energy chart"></canvas></section>
     </section>
     <aside class="side-panel" aria-label="Experiment panels">
+      <!-- Arrow keys are handled on the tablist; focus stays on the tab buttons (roving tabindex). -->
+      <!-- eslint-disable-next-line @angular-eslint/template/interactive-supports-focus -->
       <nav class="panel-tabs" role="tablist" aria-label="Lab panels" (keydown)="tabKey($event)">
         <button id="inspector-tab" role="tab" aria-controls="inspector-panel" [attr.aria-selected]="panel() === 'inspector'" [tabIndex]="panel() === 'inspector' ? 0 : -1" (click)="panel.set('inspector')">Inspector</button>
         <button id="environment-tab" role="tab" aria-controls="environment-panel" [attr.aria-selected]="panel() === 'environment'" [tabIndex]="panel() === 'environment' ? 0 : -1" (click)="panel.set('environment')">Environment</button>

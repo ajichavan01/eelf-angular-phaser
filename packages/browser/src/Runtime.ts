@@ -61,7 +61,7 @@ export class SimulationRuntime {
           try { restored = parseWorld(command.text); }
           catch (error) {
             const detail = error instanceof SyntaxError ? 'The file is not valid JSON.' : error instanceof Error ? error.message : 'The file is not an Eelf export.';
-            throw new Error(`Experiment not imported. ${detail} Choose a .json file exported from Eelf. Your current experiment is unchanged.`);
+            throw new Error(`Experiment not imported. ${detail} Choose a .json file exported from Eelf. Your current experiment is unchanged.`, { cause: error });
           }
           this.world = restored;
           this.paused = true;
